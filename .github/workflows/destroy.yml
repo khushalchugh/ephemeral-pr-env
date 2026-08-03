@@ -1,0 +1,35 @@
+name: Ephemeral PR Preview
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  terraform-deploy:
+    runs-on: ubuntu-latest
+
+    # Required to request the OIDC token from GitHub
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::044889053561:role/Ephemeral-Github-Project-Role
+          aws-region: "us-east-1"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: terraform destroy -var="pr_number=${{ github.event.pull_request.number }}" -auto-approve
