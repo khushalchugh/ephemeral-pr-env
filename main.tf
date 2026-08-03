@@ -42,4 +42,11 @@ resource "aws_instance" "ephemeral_instance" {
   }
 }
 
+terraform {
+  backend "s3" {
+   bucket = "ephemeral-backend-khushal" 
+   region = "us-east-1"
+  }
+}
+
 
