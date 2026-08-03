@@ -2,12 +2,12 @@ name: Ephemeral PR Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [closed]
 
 jobs:
   terraform-deploy:
     runs-on: ubuntu-latest
-    
+
     # Required to request the OIDC token from GitHub
     permissions:
       id-token: write
@@ -31,5 +31,5 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config="key=pr-${{ github.event.pull_request.number }}/terraform.tfstate"
 
-      - name: Terraform Apply
-        run: terraform apply -var="pr_number=${{ github.event.pull_request.number }}" -auto-approve
+      - name: Terraform Destroy
+        run: terraform destroy -var="pr_number=${{ github.event.pull_request.number }}" -auto-approve
