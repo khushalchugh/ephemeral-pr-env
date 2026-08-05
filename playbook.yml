@@ -24,6 +24,7 @@
       ansible.builtin.pip:
         name: docker
         executable: pip3
+        extra_args: "--ignore-installed"
 
     - name: Ensure Docker service is running
       ansible.builtin.service:
