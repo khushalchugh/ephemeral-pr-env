@@ -1,4 +1,4 @@
-ame: Ephemeral PR Preview
+name: Ephemeral PR Preview
 
 on:
   pull_request:
