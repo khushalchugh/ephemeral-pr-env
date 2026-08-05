@@ -30,7 +30,7 @@ resource "aws_instance" "ephemeral_instance" {
   vpc_security_group_ids      = [aws_security_group.ephemeral_sg.id]
   subnet_id                   = var.ec2_subnet_id
   associate_public_ip_address = true
-  user_data                   = file("nginx.sh")
+  key_name = "ephemeral"
 
   root_block_device {
     volume_size = var.ec2_root_storage_size

@@ -1,4 +1,4 @@
-name: Ephemeral PR Preview
+ame: Ephemeral PR Preview
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 jobs:
   terraform-deploy:
     runs-on: ubuntu-latest
-    
+
     # Required to request the OIDC token from GitHub
     permissions:
       id-token: write
@@ -33,3 +33,22 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -var="pr_number=${{ github.event.pull_request.number }}" -auto-approve
+
+      - name: Get EC2 IP Address
+        run: |
+          EC2_IP=$(terraform output -raw public_ip)
+          echo "EC2_IP=$EC2_IP" >> $GITHUB_ENV
+
+      - name: Set up SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EPHEMERAL_EC2_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Install Ansible
+        run: sudo apt-get update && sudo apt-get install -y ansible
+
+      - name: Run Ansible Playbook
+        env:
+        ANSIBLE_HOST_KEY_CHECKING: "false" # Bypasses the strict host key prompt for dynamic IPs
+        run: ansible-playbook -i "${{ env.EC2_IP }}," -u ec2-user --private-key ~/.ssh/id_rsa playbook.yml

@@ -1,5 +1,5 @@
-output "public_ip_url" {
-  value = "http://${aws_instance.ephemeral_instance.public_ip}"
+output "public_ip" {
+  value = aws_instance.ephemeral_instance.public_ip
 }
 
 output "public_dns" {

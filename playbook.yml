@@ -1,0 +1,61 @@
+---
+- name: Deploy Nginx Docker Container
+  hosts: all
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Wait for SSH to become available
+      ansible.builtin.wait_for_connection:
+        delay: 5
+        timeout: 60
+
+    - name: Gather facts after SSH is ready
+      ansible.builtin.setup:
+
+    - name: Install Docker and pip (required for Python libraries)
+      ansible.builtin.yum:
+        name: 
+          - docker
+          - python3-pip
+        state: present
+
+    - name: Install Docker SDK for Python (required by community.docker)
+      ansible.builtin.pip:
+        name: docker
+        executable: pip3
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+        
+    - name: Create webapp directory
+      ansible.builtin.file:
+        path: /home/ec2-user/webapp/
+        state: directory
+
+    - name: Copy app code and Dockerfile
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: /home/ec2-user/webapp/
+      loop:
+        - Dockerfile
+        - index.html
+
+    - name: Build the Nginx Docker image
+      community.docker.docker_image:
+        name: my-nginx-app
+        build:
+          path: /home/ec2-user/webapp/
+        source: build
+
+    - name: Run the Nginx container
+      community.docker.docker_container:
+        name: webserver
+        image: my-nginx-app
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"

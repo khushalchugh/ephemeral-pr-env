@@ -1,11 +1,11 @@
-name: Ephemeral PR Preview
+name: Ephemeral PR Cleanup
 
 on:
   pull_request:
     types: [closed]
 
 jobs:
-  terraform-deploy:
+  terraform-destroy:
     runs-on: ubuntu-latest
 
     # Required to request the OIDC token from GitHub
