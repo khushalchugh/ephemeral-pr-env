@@ -47,5 +47,6 @@ resource "aws_instance" "ephemeral_instance" {
 
   tags = {
     Name = "PR-${var.pr_number}"
+    Environment = "ephemeral"
   }
 }
