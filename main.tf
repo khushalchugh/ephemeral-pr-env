@@ -11,6 +11,14 @@ resource "aws_security_group" "ephemeral_sg" {
     description = "Allow port 80"
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow port 22"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -30,7 +38,7 @@ resource "aws_instance" "ephemeral_instance" {
   vpc_security_group_ids      = [aws_security_group.ephemeral_sg.id]
   subnet_id                   = var.ec2_subnet_id
   associate_public_ip_address = true
-  user_data                   = file("nginx.sh")
+  key_name = "ephemeral"
 
   root_block_device {
     volume_size = var.ec2_root_storage_size
@@ -39,14 +47,6 @@ resource "aws_instance" "ephemeral_instance" {
 
   tags = {
     Name = "PR-${var.pr_number}"
+    Environment = "ephemeral"
   }
 }
-
-terraform {
-  backend "s3" {
-   bucket = "ephemeral-backend-khushal" 
-   region = "us-east-1"
-  }
-}
-
-
