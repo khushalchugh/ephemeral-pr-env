@@ -49,12 +49,3 @@ resource "aws_instance" "ephemeral_instance" {
     Name = "PR-${var.pr_number}"
   }
 }
-
-terraform {
-  backend "s3" {
-   bucket = "ephemeral-backend-khushal" 
-   region = "us-east-1"
-  }
-}
-
-
